@@ -1,0 +1,35 @@
+{
+  "name": "uxio.js",
+  "version": "1.0.0",
+  "description": "A backend express, middleware library that handles file uploads, easy and simple to use to use, no need of much configurations just click and go",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/godieGH/uxio.js.git"
+  },
+  "keywords": [
+    "Uxio",
+    "Uuser Experience, Interface and Optimisation",
+    "UX",
+    "uxio.js",
+    "uxio library",
+    "uxio tool",
+    "uxio server SDK"
+  ],
+  "author": "godieGH",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/godieGH/uxio.js/issues"
+  },
+  "homepage": "https://github.com/godieGH/uxio.js#readme",
+  "devDependencies": {
+    "express": "^5.1.0"
+  },
+  "dependencies": {
+    "busboy": "^1.6.0"
+  }
+}
