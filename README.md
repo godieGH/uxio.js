@@ -61,8 +61,8 @@ The middleware parses multipart/form-data and attaches a req.uxio object to the 
 | hasFiles | function | Checks if one or more files with the specified fieldname(s) were uploaded. |
 | cleanup | function | A method to manually clean up the temporary cache directory. (Called automatically on res.finish or res.close). |
 
-### Uxio.files.save(config, uxioObject)
-This is the main function for saving files from the cache to their final destination.
+### The `Uxio.files.save(config, uxioObject)` method
+This is the main function for saving form uploaded file(s) to their disired final destination.
 Parameters
  * config: object or array of object. The configuration(s) for saving files.
  * uxioObject: object. The req.uxio object from the middleware.
@@ -98,3 +98,41 @@ try {
 }
 
 ```
+
+
+
+### The `Uxio.files.send(config, uxioObject)` method
+This function sends multipart/form-data uploaded to an external destination over a network, such as cloud storage or a custom server.
+For now it supports `s3` and `customHttp` services, we are still working to build up other cloud service supports
+
+Note: Yet we still don't recommend you using this method for production until you(we) pass it  approved, verified and secured, it is still under development, so walk with cautions
+
+Parameters
+ * config: object | object[]. The configuration(s) for sending files.
+ * uxioObject: object. The req.uxio object from the middleware.
+
+Configuration Object Properties
+| Property | Type | Required | Description |
+|---|---|---|---|
+| filename | string \| string[] | Yes | The fieldname of the file(s) to send. |
+| provider | string | Yes | The destination service provider. Supported values: 's3', 'customHttp'. |
+| options | object | Yes | Provider-specific options. See details below. |
+| required | boolean | No | If true, an error is thrown if no files match the filename. Defaults to false. |
+| validations | object | No | An object for validation rules (same as save). |
+| rename | function | No | A function (file) => newFilename to rename the file before sending. |
+
+#### Provider options Details
+ * For provider: `'s3'`:
+   * `options.bucket`: (string) The name of your S3 bucket.
+   * `options.region`: (string) The AWS region of your bucket (e.g., 'us-east-1').
+   * `options.credentials`: (object) Your AWS credentials `({ accessKeyId, secretAccessKey })`.
+ * For provider: `'customHttp'`:
+   * `options.url`: (string) The full URL of the endpoint that will receive the file.
+   * `options.axiosConfig`: (object, optional) A standard Axios config object for custom headers, etc. **You might pass through axios documentations to understand these**
+
+Returns
+A Promise that resolves to an array of objects, each containing metadata from the external provider's response (e.g., S3 object URL, key, bucket).
+- The response information might differ or depend on Configuration(s) or the way way the services handle the sent file, if well configured can return back a full enough file(s) info
+
+Error Handling
+Both save and send methods throw a custom `FileSaveError` class with a status property. This allows for specific and consistent error handling in your routes.
