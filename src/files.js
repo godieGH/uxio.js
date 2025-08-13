@@ -136,7 +136,7 @@ const files = {
             originalName: fileToSave.filename,
             path: finalFilePath,
             size: fileToSave.size,
-            mimeType: fileToSave.mimetype,
+            mimeType: fileToSave.mimeType,
           };
           savedFilesInfo.push(fileInfo);
         } // End of file-by-file loop
@@ -252,7 +252,7 @@ const files = {
                 Bucket: options.bucket,
                 Key: newFilename,
                 Body: fileStream,
-                ContentType: fileToSend.mimetype,
+                ContentType: fileToSend.mimeType,
                 ContentLength: fileToSend.size,
               });
 
@@ -264,7 +264,7 @@ const files = {
                 key: newFilename,
                 url: `https://${options.bucket}.s3.${options.region}.amazonaws.com/${encodeURIComponent(newFilename)}`,
                 size: fileToSend.size,
-                mimeType: fileToSend.mimetype,
+                mimeType: fileToSend.mimeType,
               };
               uploadedObjectsForRollback.push({ provider: 's3', ...uploadResult });
               break;
@@ -277,7 +277,7 @@ const files = {
 
               const response = await axios.post(options.url, fileStream, {
                 headers: {
-                  'Content-Type': fileToSend.mimetype,
+                  'Content-Type': fileToSend.mimeType,
                   'Content-Length': fileToSend.size,
                   // Pass original filename in a header if needed by the server
                   'X-Original-Filename': encodeURIComponent(fileToSend.filename),
