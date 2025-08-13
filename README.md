@@ -1,9 +1,9 @@
-# Uxio
+# Uxio.js
 A simple yet powerful Node.js (express.js) middleware, providing backend tools and Optimisazions feature, i.e handling multipart/form-data file uploads with fine-grained control over the saving process and much more other simplified backend tasks. 
 
 **We are still working on other Web frameworks too, i.e for node, python, ruby and others**
 
-## Uxio File Upload
+## Uxio.js File Upload
 > Uxio decouples file parsing from file saving, allowing you to run custom business logic and validations within your route handlers before committing files to permanent storage.
 
 Features
@@ -17,7 +17,7 @@ Features
 
 ### Installation
 ```bash
-npm install uxio
+npm install uxio.js
 ```
 
 Usage
