@@ -32,7 +32,6 @@
     "supertest": "^7.1.4"
   },
   "dependencies": {
-    "busboy": "^1.6.0",
-    "file-type": "^21.0.0"
+    "busboy": "^1.6.0"
   }
 }
