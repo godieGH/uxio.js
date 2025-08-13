@@ -5,6 +5,9 @@ const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/cl
 const axios = require("axios");
 
 
+const getMetadata = require('./metadata-helper.js')
+
+
 /**
  * Custom error class for file-related operations.
  * Allows throwing errors with a specific status code for better API handling.
@@ -109,6 +112,8 @@ const files = {
               }
             }
           }
+          
+          const metadata = await getMetadata(fileToSave.tempFilePath, fileToSave.mimeType)
 
           // 2. Renaming
           const newFilename = typeof rename === "function" ? rename(fileToSave) : fileToSave.filename;
@@ -137,6 +142,7 @@ const files = {
             path: finalFilePath,
             size: fileToSave.size,
             mimeType: fileToSave.mimeType,
+            ...metadata,
           };
           savedFilesInfo.push(fileInfo);
         } // End of file-by-file loop
@@ -233,6 +239,9 @@ const files = {
               }
             }
           }
+          
+          const metadata = await getMetadata(fileToSend.tempFilePath, fileToSend.mimeType)
+          
 
           const newFilename = typeof rename === "function" ? rename(fileToSend) : fileToSend.filename;
           const fileStream = fs.createReadStream(fileToSend.tempFilePath);
@@ -265,6 +274,7 @@ const files = {
                 url: `https://${options.bucket}.s3.${options.region}.amazonaws.com/${encodeURIComponent(newFilename)}`,
                 size: fileToSend.size,
                 mimeType: fileToSend.mimeType,
+                ...metadata,
               };
               uploadedObjectsForRollback.push({ provider: 's3', ...uploadResult });
               break;
@@ -288,6 +298,7 @@ const files = {
               uploadResult = {
                   provider: 'customHttp',
                   ...response.data, // Assume the server returns JSON with file info
+                  ...metadata,
               };
               // Note: Rollback for customHttp is complex and not implemented here.
               // The destination server would need to provide a DELETE endpoint.
