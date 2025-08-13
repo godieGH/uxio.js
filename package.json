@@ -4,7 +4,7 @@
   "description": "A backend express, middleware library that handles file uploads, easy and simple to use to use, no need of much configurations just click and go",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "dev": "nodemon"
   },
   "repository": {
@@ -27,9 +27,12 @@
   },
   "homepage": "https://github.com/godieGH/uxio.js#readme",
   "devDependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "jest": "^30.0.5",
+    "supertest": "^7.1.4"
   },
   "dependencies": {
-    "busboy": "^1.6.0"
+    "busboy": "^1.6.0",
+    "file-type": "^21.0.0"
   }
 }
