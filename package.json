@@ -1,5 +1,5 @@
 {
-  "name": "uxio.js",
+  "name": "uxio",
   "version": "1.0.0",
   "description": "A backend express, middleware library that handles file uploads, easy and simple to use to use, no need of much configurations just click and go",
   "main": "index.js",

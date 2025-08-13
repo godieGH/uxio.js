@@ -17,7 +17,7 @@ Features
 
 ### Installation
 ```bash
-npm install uxio.js
+npm install uxio
 ```
 
 Usage
