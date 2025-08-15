@@ -20,13 +20,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'pnpm'
+          node-version: 20
 
-      - name: Install pnpm globally and fix PATH
-        run: |
-          npm install -g pnpm
-          echo "$(npm root -g)/.bin" >> $GITHUB_PATH
+      - name: Install pnpm
+        run: npm install -g pnpm
 
       - name: Install dependencies
         run: pnpm install
