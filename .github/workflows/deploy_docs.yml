@@ -22,8 +22,9 @@ jobs:
         with:
           node-version: '18'
           cache: 'pnpm'
-          # The 'cache' option automatically installs and caches pnpm
-          # so you don't need a separate step.
+
+      - name: Install pnpm globally
+        run: npm install -g pnpm
 
       - name: Install dependencies
         run: pnpm install
