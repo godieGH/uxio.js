@@ -21,13 +21,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'pnpm'
+          cache: 'npm' # Change cache to 'npm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install # Change to 'npm install'
 
       - name: Generate JSDoc documentation
-        run: npx pnpm run docs
+        run: npm run docs # Change to 'npm run docs'
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
