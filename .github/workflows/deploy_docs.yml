@@ -1,19 +1,16 @@
 name: Deploy JSDoc to GitHub Pages
 
-# This workflow will run on every push to the main branch
 on:
   push:
     branches:
       - main
 
-# Permissions for the GITHUB_TOKEN to allow deployment to pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
 jobs:
-  # The "build_and_deploy" job
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
@@ -25,9 +22,8 @@ jobs:
         with:
           node-version: '18'
           cache: 'pnpm'
-
-      - name: Install pnpm
-        run: npm install -g pnpm
+          # The 'cache' option automatically installs and caches pnpm
+          # so you don't need a separate step.
 
       - name: Install dependencies
         run: pnpm install
