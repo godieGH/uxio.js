@@ -1,4 +1,51 @@
-const { promisify: promisify } = require("util");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>src/metadata-helper.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-files-FileSaveError.html">FileSaveError</a></li></ul><h3>Modules</h3><ul><li><a href="module-files.html">files</a><ul class='methods'><li data-type='method'><a href="module-files.html#.save">save</a></li><li data-type='method'><a href="module-files.html#.send">send</a></li></ul></li><li><a href="module-metadata-helper.html">metadata-helper</a><ul class='methods'><li data-type='method'><a href="module-metadata-helper.html#~getMetadata">getMetadata</a></li><li data-type='method'><a href="module-metadata-helper.html#~handleBinary">handleBinary</a></li><li data-type='method'><a href="module-metadata-helper.html#~handleExcel">handleExcel</a></li><li data-type='method'><a href="module-metadata-helper.html#~handleImage">handleImage</a></li><li data-type='method'><a href="module-metadata-helper.html#~handleMedia">handleMedia</a></li><li data-type='method'><a href="module-metadata-helper.html#~handlePdf">handlePdf</a></li><li data-type='method'><a href="module-metadata-helper.html#~handlePowerPoint">handlePowerPoint</a></li><li data-type='method'><a href="module-metadata-helper.html#~handleText">handleText</a></li><li data-type='method'><a href="module-metadata-helper.html#~handleWord">handleWord</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#Uxio">Uxio</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">src/metadata-helper.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { promisify: promisify } = require("util");
 const { exec: exec } = require("child_process");
 const { fileTypeFromBuffer: fileTypeFromBuffer } = require("file-type");
 const { imageSize: imageSize } = require("image-size");
@@ -74,7 +121,7 @@ const execPromise = promisify(exec);
 /**
  * Uses the `image-size` library to extract image properties.
  * @param {string} filepath - The path to the image file.
- * @returns {Promise<imageData>} A promise that resolves to the image metadata.
+ * @returns {Promise&lt;imageData>} A promise that resolves to the image metadata.
  */
 const handleImage = async (filepath) => {
   const size = imageSize(readFileSync(filepath));
@@ -89,7 +136,7 @@ const handleImage = async (filepath) => {
 /**
  * Uses `ffprobe` to extract metadata for video and audio files.
  * @param {string} filepath - The path to the media file.
- * @returns {Promise<mediaData>} A promise that resolves to the media metadata.
+ * @returns {Promise&lt;mediaData>} A promise that resolves to the media metadata.
  */
 const handleMedia = async (filepath) => {
   const command = `ffprobe -v error -show_format -show_streams -of json "${filepath}"`;
@@ -117,7 +164,7 @@ const handleMedia = async (filepath) => {
 /**
  * Parses a PDF file to extract page count and document info.
  * @param {string} filepath - The path to the PDF file.
- * @returns {Promise<pdfData>} A promise that resolves to the PDF metadata.
+ * @returns {Promise&lt;pdfData>} A promise that resolves to the PDF metadata.
  */
 const handlePdf = async (filepath) => {
   const buffer = readFileSync(filepath);
@@ -128,7 +175,7 @@ const handlePdf = async (filepath) => {
 /**
  * Parses an Excel file to get the number of sheets and their names.
  * @param {string} filepath - The path to the Excel file.
- * @returns {Promise<excelData>} A promise that resolves to the Excel metadata.
+ * @returns {Promise&lt;excelData>} A promise that resolves to the Excel metadata.
  */
 const handleExcel = async (filepath) => {
   const workbook = XLSX.readFile(filepath);
@@ -138,17 +185,17 @@ const handleExcel = async (filepath) => {
 /**
  * Parses a PowerPoint file to get the number of slides.
  * @param {string} filepath - The path to the PowerPoint file.
- * @returns {Promise<powerPointData>} A promise that resolves to the PowerPoint metadata.
+ * @returns {Promise&lt;powerPointData>} A promise that resolves to the PowerPoint metadata.
  */
 const handlePowerPoint = async (filepath) => {
   const { slides } = await officeparser.parse(filepath);
-  return { slidesCount: slides && slides.length > 0 ? slides.length : null };
+  return { slidesCount: slides &amp;&amp; slides.length > 0 ? slides.length : null };
 };
 
 /**
  * Extracts raw text from a Word document to get word and character counts.
  * @param {string} filepath - The path to the Word file.
- * @returns {Promise<wordData>} A promise that resolves to the Word document metadata.
+ * @returns {Promise&lt;wordData>} A promise that resolves to the Word document metadata.
  */
 const handleWord = async (filepath) => {
   const { value } = await mammoth.extractRawText({ path: filepath });
@@ -160,7 +207,7 @@ const handleWord = async (filepath) => {
 /**
  * Reads a text file and extracts basic statistics.
  * @param {string} filepath - The path to the text file.
- * @returns {Promise<textData>} A promise that resolves to the text file metadata.
+ * @returns {Promise&lt;textData>} A promise that resolves to the text file metadata.
  */
 const handleText = async (filepath) => {
   const content = await fs.readFile(filepath, "utf-8");
@@ -175,7 +222,7 @@ const handleText = async (filepath) => {
 /**
  * A fallback handler that uses the system's 'file' command to get generic information.
  * @param {string} filepath - The path to the binary file.
- * @returns {Promise<binaryData>} A promise that resolves to the file's platform info.
+ * @returns {Promise&lt;binaryData>} A promise that resolves to the file's platform info.
  */
 const handleBinary = async (filepath) => {
   try {
@@ -192,7 +239,7 @@ const handleBinary = async (filepath) => {
 
 /**
  * A map of MIME type prefixes to their corresponding metadata handler functions.
- * @type {Object<string, Function>}
+ * @type {Object&lt;string, Function>}
  */
 const handlers = {
   "image/": handleImage,
@@ -211,7 +258,7 @@ const handlers = {
  * uses the appropriate handler. If no specific handler is found, it uses a fallback handler.
  * @param {string} filepath - The path to the file.
  * @param {string} [mimeType] - Optional MIME type to bypass file type detection.
- * @returns {Promise<object>} A promise that resolves to an object containing the file's metadata.
+ * @returns {Promise&lt;object>} A promise that resolves to an object containing the file's metadata.
  */
 const getMetadata = async (filepath, mimeType) => {
   let metadata = { mimeType: mimeType || "application/octet-stream" };
@@ -242,3 +289,28 @@ const getMetadata = async (filepath, mimeType) => {
 };
 
 module.exports = getMetadata;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Fri Aug 15 2025 08:07:58 GMT+0300 (East Africa Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

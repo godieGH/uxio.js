@@ -140,5 +140,5 @@ uploads/
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-app.js
 __tests__/index.html
+__tests__/uploads/

@@ -5,7 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "docs": "jsdoc -c jsdoc.json"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/__tests__/app.js" 
+    ]
   },
   "repository": {
     "type": "git",
@@ -13,7 +20,7 @@
   },
   "keywords": [
     "Uxio",
-    "Uuser Experience, Interface and Optimisation",
+    "User Experience, Interface and Optimisation",
     "UX",
     "uxio.js",
     "uxio library",
@@ -27,8 +34,10 @@
   },
   "homepage": "https://github.com/godieGH/uxio.js#readme",
   "devDependencies": {
+    "docdash": "^2.0.2",
     "express": "^5.1.0",
     "jest": "^30.0.5",
+    "jsdoc": "^4.0.4",
     "supertest": "^7.1.4"
   },
   "dependencies": {
@@ -41,5 +50,6 @@
     "officeparser": "^5.2.0",
     "pdf-parse": "^1.1.1",
     "xlsx": "^0.18.5"
-  }
+  },
+  "packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748"
 }

@@ -1,4 +1,51 @@
-// src/files.js
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>files.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-files-FileSaveError.html">FileSaveError</a></li></ul><h3>Modules</h3><ul><li><a href="module-files.html">files</a><ul class='methods'><li data-type='method'><a href="module-files.html#.save">save</a></li><li data-type='method'><a href="module-files.html#.send">send</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#Uxio">Uxio</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">files.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// src/files.js
 const path = require("path");
 const fs = require("fs");
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
@@ -8,12 +55,6 @@ const getMetadata = require('./metadata-helper.js')
 
 /**
  * @module files
- */
- 
- /**
-  * @typedef {object} validations
-  * @property {number} [maxSize] Maximum file size in bytes.
-  * @property {string[]} [mimeType] Allowed MIME types.
  */
 
 /**
@@ -42,10 +83,12 @@ const files = {
    * @param {string} config.path The destination directory to save the files.
    * @param {boolean} [config.required=false] If true, an error is thrown if no files match the filename(s).
    * @param {boolean} [config.makedir=false] If true, the destination directory will be created recursively if not found.
-   * @param {validations} [config.validations] Optional validation rules. see <a href="#~validations">validations</a>
+   * @param {object} [config.validations] Optional validation rules.
+   * @param {number} [config.validations.maxSize] Maximum file size in bytes.
+   * @param {string|string[]} [config.validations.mimeType] Allowed MIME types.
    * @param {function} [config.rename] A function to rename the file.
    * @param {object} uxioObject The `req.uxio` object containing cached file data.
-   * @returns {Promise<object[]>} An array of file info objects.
+   * @returns {Promise&lt;object[]>} An array of file info objects.
    */
   save: async (config, uxioObject) => {
     // Standardize config into an array to simplify processing
@@ -53,6 +96,7 @@ const files = {
     const savedFilesInfo = [];
     const savedFilePathsForRollback = [];
 
+    // --- MAIN PROCESSING LOOP ---
     try {
       for (const currentConfig of configsToProcess) {
         const {
@@ -61,7 +105,7 @@ const files = {
           validations,
           rename,
           required = false,
-          makedir = false, 
+          makedir = false, // &lt;-- Added new config property
         } = currentConfig;
 
         const filenamesToSave = Array.isArray(filename) ? filename : [filename];
@@ -69,34 +113,44 @@ const files = {
           filenamesToSave.includes(f.fieldname),
         );
 
-        if (required && filesToSave.length === 0) {
+        // Handle the 'required' flag
+        if (required &amp;&amp; filesToSave.length === 0) {
           throw new FileSaveError(
             `Required files not found for fields: ${filenamesToSave.join(", ")}.`,
             404,
           );
         }
 
+        // Skip to the next config if no files match but are not required
         if (filesToSave.length === 0) {
           continue;
         }
 
+        // --- NEW LOGIC FOR MAKEDIR FLAG ---
+        // Check if the destination directory exists and handle creation based on the flag.
         try {
           await fs.promises.access(destinationPath);
         } catch (err) {
+          // If the directory doesn't exist (ENOENT error)
           if (err.code === 'ENOENT') {
             if (makedir) {
+              // Create the directory recursively if `makedir` is true
               await fs.promises.mkdir(destinationPath, { recursive: true });
             } else {
+              // Throw an error if the directory doesn't exist and `makedir` is false
               throw new FileSaveError(`Destination directory not found: ${destinationPath}`, 404);
             }
           } else {
+            // Re-throw any other type of error
             throw err;
           }
         }
 
+        // --- FILE-BY-FILE PROCESSING LOOP ---
         for (const fileToSave of filesToSave) {
+          // 1. Validation Logic
           if (validations) {
-            if (validations.maxSize && fileToSave.size > validations.maxSize) {
+            if (validations.maxSize &amp;&amp; fileToSave.size > validations.maxSize) {
               throw new FileSaveError(
                 `File size for '${fileToSave.filename}' exceeds limit of ${validations.maxSize} bytes.`,
               );
@@ -113,23 +167,27 @@ const files = {
           
           const metadata = await getMetadata(fileToSave.tempFilePath, fileToSave.mimeType)
 
+          // 2. Renaming
           const newFilename = typeof rename === "function" ? rename(fileToSave) : fileToSave.filename;
           const finalFilePath = path.join(destinationPath, newFilename);
 
+          // Check if a file with the same name already exists to prevent overwriting
           try {
             await fs.promises.access(finalFilePath, fs.constants.F_OK);
             throw new FileSaveError(`File with name '${newFilename}' already exists.`, 409);
           } catch (e) {
-            if (e.code !== 'ENOENT' && e.status !== 409) {
+            if (e.code !== 'ENOENT' &amp;&amp; e.status !== 409) {
                 throw e;
             } else if (e.status === 409) {
                 throw e;
             }
           }
 
+          // 3. Move the file from temp cache to final destination
           await fs.promises.rename(fileToSave.tempFilePath, finalFilePath);
           savedFilePathsForRollback.push(finalFilePath);
 
+          // 4. Create and store the file info
           const fileInfo = {
             fieldname: fileToSave.fieldname,
             originalName: fileToSave.filename,
@@ -139,9 +197,10 @@ const files = {
             ...metadata,
           };
           savedFilesInfo.push(fileInfo);
-        }
-      }
+        } // End of file-by-file loop
+      } // End of main config loop
     } catch (err) {
+      // --- ERROR HANDLING AND ROLLBACK ---
       console.error("File save operation failed. Initiating rollback...", err);
       const cleanupPromises = savedFilePathsForRollback.map((filePath) =>
         fs.promises.unlink(filePath).catch((cleanupErr) => {
@@ -172,10 +231,10 @@ const files = {
    * @param {string} config.provider The destination service provider (e.g., 's3', 'customHttp').
    * @param {object} config.options Provider-specific options.
    * @param {boolean} [config.required=false] If true, throws an error if no files match the filename(s).
-   * @param {validations} [config.validations] Optional validation rules. see <a href="#~validations">validations</a>
+   * @param {object} [config.validations] Optional validation rules.
    * @param {function} [config.rename] A function to rename the file before sending.
    * @param {object} uxioObject The `req.uxio` object containing cached file data.
-   * @returns {Promise<object[]>} An array of file info objects from the provider.
+   * @returns {Promise&lt;object[]>} An array of file info objects from the provider.
    */
   send: async (config, uxioObject) => {
     const configsToProcess = Array.isArray(config) ? config : [config];
@@ -202,7 +261,7 @@ const files = {
           filenamesToSend.includes(f.fieldname),
         );
 
-        if (required && filesToSend.length === 0) {
+        if (required &amp;&amp; filesToSend.length === 0) {
           throw new FileSaveError(
             `Required files not found for fields: ${filenamesToSend.join(", ")}.`,
             404,
@@ -214,8 +273,9 @@ const files = {
         }
 
         for (const fileToSend of filesToSend) {
+          // 1. Validation Logic (identical to 'save' method)
           if (validations) {
-            if (validations.maxSize && fileToSend.size > validations.maxSize) {
+            if (validations.maxSize &amp;&amp; fileToSend.size > validations.maxSize) {
               throw new FileSaveError(
                 `File size for '${fileToSend.filename}' exceeds limit of ${validations.maxSize} bytes.`,
               );
@@ -239,6 +299,7 @@ const files = {
           const fileStream = fs.createReadStream(fileToSend.tempFilePath);
           let uploadResult;
 
+          // 2. Provider-specific upload logic
           switch (provider.toLowerCase()) {
             case "s3": {
               if (!options || !options.bucket || !options.region || !options.credentials) {
@@ -280,21 +341,19 @@ const files = {
                 headers: {
                   'Content-Type': fileToSend.mimeType,
                   'Content-Length': fileToSend.size,
+                  // Pass original filename in a header if needed by the server
                   'X-Original-Filename': encodeURIComponent(fileToSend.filename),
                 },
-                ...options.axiosConfig, 
+                ...options.axiosConfig, // Allow passing other axios configs
               });
 
               uploadResult = {
                   provider: 'customHttp',
-                  ...response.data, 
+                  ...response.data, // Assume the server returns JSON with file info
                   ...metadata,
               };
-              /**
-               * 
-               * Note: Rollback for customHttp is complex and not implemented here.
-               * The destination server would need to provide a DELETE endpoint.
-               */
+              // Note: Rollback for customHttp is complex and not implemented here.
+              // The destination server would need to provide a DELETE endpoint.
               break;
             }
 
@@ -306,6 +365,7 @@ const files = {
         }
       }
     } catch (err) {
+      // --- ERROR HANDLING AND ROLLBACK ---
       console.error("File send operation failed. Initiating rollback...", err);
       
       const cleanupPromises = uploadedObjectsForRollback.map(async (item) => {
@@ -322,6 +382,7 @@ const files = {
             });
             await s3Client.send(command);
           }
+          // Add rollback logic for other providers here if possible
         } catch (cleanupErr) {
            console.error(`Failed to delete sent file during rollback: ${item.key || item.url}`, cleanupErr);
         }
@@ -344,3 +405,28 @@ const files = {
 };
 
 module.exports = files;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Fri Aug 15 2025 05:26:37 GMT+0300 (East Africa Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>
