@@ -23,14 +23,11 @@ jobs:
           node-version: '18'
           cache: 'pnpm'
 
-      - name: Install pnpm globally
-        run: npm install -g pnpm
-
       - name: Install dependencies
         run: pnpm install
 
       - name: Generate JSDoc documentation
-        run: pnpm run docs
+        run: npx pnpm run docs
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
