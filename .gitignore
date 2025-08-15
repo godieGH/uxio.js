@@ -142,3 +142,5 @@ vite.config.ts.timestamp-*
 
 __tests__/index.html
 __tests__/uploads/
+
+docs/
