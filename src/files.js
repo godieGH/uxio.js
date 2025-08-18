@@ -38,7 +38,8 @@ const files = {
    * On failure, any files that were already saved successfully are deleted (rolled back).
    *
    * @param {object|object[]} config The save configuration.
-   * @param {string|string[]} config.filename The field name(s) of the file(s) to save.
+   * @param {string|string[]} config.fieldname The field name(s) of the file(s) to save.
+   * @param {string|string[]} config.filename (DEPRECATED) use fieldname instead.
    * @param {string} config.path The destination directory to save the files.
    * @param {boolean} [config.required=false] If true, an error is thrown if no files match the filename(s).
    * @param {boolean} [config.makedir=false] If true, the destination directory will be created recursively if not found.
@@ -56,6 +57,7 @@ const files = {
     try {
       for (const currentConfig of configsToProcess) {
         const {
+          fieldname,
           filename,
           path: destinationPath,
           validations,
@@ -64,14 +66,21 @@ const files = {
           makedir = false, 
         } = currentConfig;
 
-        const filenamesToSave = Array.isArray(filename) ? filename : [filename];
+        const fieldnamesToSave = fieldname
+    ? (Array.isArray(fieldname) ? fieldname : [fieldname])
+    : (Array.isArray(filename) ? filename : [filename]);
+    
+    if (!fieldname && filename) {
+    console.warn("Deprecation Warning: 'filename' is deprecated. Please use 'fieldname' instead.");
+}
+    
         const filesToSave = uxioObject.files.filter((f) =>
-          filenamesToSave.includes(f.fieldname),
+          fieldnamesToSave.includes(f.fieldname),
         );
 
         if (required && filesToSave.length === 0) {
           throw new FileSaveError(
-            `Required files not found for fields: ${filenamesToSave.join(", ")}.`,
+            `Required files not found for fields: ${fieldnamesToSave.join(", ")}.`,
             404,
           );
         }
@@ -168,7 +177,8 @@ const files = {
    * On failure, any files that were already sent are deleted from the external service (rolled back).
    *
    * @param {object|object[]} config The send configuration.
-   * @param {string|string[]} config.filename The field name(s) of the file(s) to send.
+   * @param {string|string[]} config.fieldname The field name(s) of the file(s) to send.
+   * @param {string|string[]} [config.filename] (DEPRECATED) Use 'fieldname' instead.
    * @param {string} config.provider The destination service provider (e.g., 's3', 'customHttp').
    * @param {object} config.options Provider-specific options.
    * @param {boolean} [config.required=false] If true, throws an error if no files match the filename(s).
@@ -186,6 +196,7 @@ const files = {
       for (const currentConfig of configsToProcess) {
         const {
           filename,
+          fieldname,
           provider,
           options,
           validations,
@@ -197,14 +208,20 @@ const files = {
           throw new FileSaveError("A 'provider' must be specified in the configuration.", 400);
         }
 
-        const filenamesToSend = Array.isArray(filename) ? filename : [filename];
+        const fieldnamesToSend = fieldname
+    ? (Array.isArray(fieldname) ? fieldname : [fieldname])
+    : (Array.isArray(filename) ? filename : [filename]);
+    
+   if (!fieldname && filename) {
+    console.warn("Deprecation Warning: 'filename' is deprecated. Please use 'fieldname' instead.");
+} 
         const filesToSend = uxioObject.files.filter((f) =>
-          filenamesToSend.includes(f.fieldname),
+          fieldnamesToSend.includes(f.fieldname),
         );
 
         if (required && filesToSend.length === 0) {
           throw new FileSaveError(
-            `Required files not found for fields: ${filenamesToSend.join(", ")}.`,
+            `Required files not found for fields: ${fieldnamesToSend.join(", ")}.`,
             404,
           );
         }
