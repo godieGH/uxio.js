@@ -3,7 +3,7 @@
 A simple yet powerful Node.js (Express.js) middleware that provides backend tools and optimization features such as handling `multipart/form-data` file uploads with fine-grained control over the saving process, as well as many other simplified backend tasks.
 
 We are actively developing support for other web frameworks, including those for Node, Python, Ruby, and more.
-
+> [read more here](https://godiegh.github.io/uxio.js/module-files.html#~validations) to contribute.
 ---
 
 ## Uxio File Upload
